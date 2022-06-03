@@ -1,0 +1,6 @@
+{
+    "imports" : {
+        "Colors" : "https://deno.land/std@0.142.0/fmt/colors.ts" ,
+        "Color" : "./Color.js"
+    }
+}

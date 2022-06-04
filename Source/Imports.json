@@ -1,6 +1,9 @@
 {
     "imports" : {
         "Colors" : "https://deno.land/std@0.142.0/fmt/colors.ts" ,
-        "Color" : "./Color.js"
+        "Args"   : "https://deno.land/std@0.142.0/flags/mod.ts" ,
+        "Path"   : "https://deno.land/std@0.142.0/path/mod.ts" ,
+
+        "Color"  : "./Color.js"
     }
 }

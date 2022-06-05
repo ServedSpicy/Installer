@@ -12,7 +12,7 @@ const home = Parameter.home;
 
 
 export const desktop_entry =
-    join('/','usr','share','applications','ServedSpicy.desktop');
+    join(home,'.local','share','applications','ServedSpicy.desktop');
 
 export const config =
     join(home,'.cache','ServedSpicy');

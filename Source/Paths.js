@@ -11,17 +11,20 @@ const Parameter = parse(Deno.args);
 const home = Parameter.home;
 
 
-export const desktop_entry = 
+export const desktop_entry =
     join('/','usr','share','applications','ServedSpicy.desktop');
 
-export const config = 
+export const config =
     join(home,'.cache','ServedSpicy');
 
-export const folder = 
+export const folder =
     join(home,'.ServedSpicy');
+
+export const app_folder =
+    join(folder,'App');
 
 export const app_icon =
     join(folder,'App','Icons','App.png');
-    
+
 export const app_launcher =
     join(folder,'App','Client.sh');

@@ -2,6 +2,8 @@
 import { blue , red , bold , dark } from 'Color';
 import { join } from 'Path';
 import { emptyDir } from 'File';
+import { walk } from 'File';
+
 
 const { log , clear } = console;
 
@@ -232,6 +234,9 @@ async function curlRelease(){
     }
 
     await Deno.remove(dir,{ recursive : true });
+
+    for await (const file of walk(folder))
+        await Deno.chown(file.path,Parameter.user,Parameter.group);
 }
 
 
@@ -430,7 +435,6 @@ async function removeApplicationFolder(){
     await Deno.remove(folder,{ recursive : true });
 }
 
-import { walk } from 'File';
 
 
 async function * removeTemporaryFiles(){

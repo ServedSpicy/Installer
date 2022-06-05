@@ -8,7 +8,7 @@ const variables = {
     Version : '1.4' ,
     Name : 'ServedSpicy' ,
     Comment : 'The recipe manager for ServedSpicy machines.' ,
-    Exec : `"nohup ${ app_launcher } 2424 2425 > Log.txt 2>&1 &"` ,
+    Exec : `nohup ${ app_launcher } 2424 2425 > Log.txt 2>&1 &` ,
     Icon : app_icon ,
     Path : app_folder ,
     Terminal : 'false' ,

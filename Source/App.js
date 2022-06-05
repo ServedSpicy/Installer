@@ -39,6 +39,7 @@ const { writeTextFile } = Deno;
 
 async function addDesktopEntry(){
     await writeTextFile(desktop_entry,entry);
+    await Deno.chown(desktop_entry,Parameter.user,Parameter.group);
 }
 
 

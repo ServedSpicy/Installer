@@ -263,7 +263,7 @@ async function install(){
 
     let installed = false;
 
-    // installed = await isSerialInstalled();
+    installed = await isSerialInstalled();
 
     if(installed){
 

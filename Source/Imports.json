@@ -3,6 +3,7 @@
         "Colors" : "https://deno.land/std@0.142.0/fmt/colors.ts" ,
         "Args"   : "https://deno.land/std@0.142.0/flags/mod.ts" ,
         "Path"   : "https://deno.land/std@0.142.0/path/mod.ts" ,
+        "File"   : "https://deno.land/std@0.142.0/fs/mod.ts" ,
 
         "Color"  : "./Color.js"
     }

@@ -1,6 +1,7 @@
 
 import { blue , red , bold , dark } from 'Color';
 import { join } from 'Path';
+import { emptyDir } from 'File';
 
 const { log , clear } = console;
 
@@ -19,11 +20,21 @@ const Enter = [ 13 ];
 const Escape = [ 27 ];
 
 const folder = join(Parameter.home,'.ServedSpicy');
-const desktop_entry = '/usr/share/applications/ServedSpicy.desktop';
 
 
 
 const { min , max } = Math;
+
+
+
+import { desktop_entry } from './Paths.js'
+import { entry } from './Entry.js'
+
+const { writeTextFile } = Deno;
+
+async function addDesktopEntry(){
+    await writeTextFile(desktop_entry,entry);
+}
 
 
 
@@ -68,13 +79,17 @@ function drawInstallMenu(){
 
     clear();
 
-    content = [
+    log(fill([
         '' ,
         `  Ｉｎｓｔａｌｌｉｎｇ　${ bold(red('ＳｅｒｖｅｄＳｐｉｃｙ')) }`,
+        '' ,
+        ... content ,
+        ... lines(rows - (content.length + 3 + 4)) ,
+        '' ,
+        center(actions) ,
+        '' ,
         ''
-    ];
-
-    log(fill(content.join('\n'),dark));
+    ].join('\n'),dark));
 
 
 }
@@ -139,12 +154,261 @@ case 3:
 exit();
 
 
+async function isSerialInstalled(){
+
+    const process = Deno.run({
+        cmd : [ 'dpkg-query' , '--show' , '--showformat=${Package}|${Version}' , 'libserial1' ],
+        stdout : 'piped'
+    });
+
+    const status = await process.status();
+
+    // log(process,status);
+
+    const out = await process.output();
+
+    let packages = new TextDecoder().decode(out);
+
+    if(packages.startsWith('dpkg-query: no packages found matching'))
+        return false;
+
+    packages = packages
+        .split('\n')
+        .filter(a => a)
+        .map((info) => info.split('|'));
+
+    packages = new Map(packages);
+
+    return packages.has('libserial1');
+}
+
+async function installSerialLibrary(){
+
+    const process = Deno.run({
+        cmd : [ 'apt' , 'install' , 'libserial1' ],
+        stdout : 'null' ,
+        stderr : 'null'
+    });
+
+    const status = await process.status();
+
+    // log(status);
+
+    // Deno.exit();
+}
+
+async function createFolder(){
+    await emptyDir(folder);
+}
+
+async function makeTemporaryFolder(){
+    return await Deno.makeTempDir({ prefix : 'ServedSpicy_' });
+}
+
+async function curlRelease(){
+
+    const dir = await makeTemporaryFolder();
+
+    const release = 'https://github.com/ServedSpicy/Bundle/releases/download/Dummy/Dummy.zip';
+
+    {
+        const process = Deno.run({
+            cmd : [ 'curl' , '--output' , join(dir,'Release.zip') , '-LJO' , release ],
+            stdout : 'null' ,
+            stderr : 'null'
+        });
+
+        const status = await process.status();
+    }
+
+    {
+        const process = Deno.run({
+            cmd : [ 'unzip' , '-d' , folder , join(dir,'Release.zip') ],
+            stdout : 'null' ,
+            stderr : 'null'
+        });
+
+        const status = await process.status();
+    }
+
+    await Deno.remove(dir,{ recursive : true });
+}
+
+
 async function install(){
+
+    actions = '';
+
+    content = [
+        `   ⏳ Installing ${ red('Serial Library') } via ${ red('DPKG') }.` ,
+        `      ⤷ ${ blue('libserial1') }`
+    ];
 
     drawInstallMenu();
 
+    let before = Date.now();
+
+    let result = [
+        `   ✅ Installed ${ red('Serial Library') } via ${ red('DPKG') }.` ,
+        `      ⤷ ${ blue('libserial1') }`
+    ];
+
+    let installed = false;
+
+    // installed = await isSerialInstalled();
+
+    if(installed){
+
+        result = [
+            `   💬 The ${ red('Serial Library') } was already installed.` ,
+            `      ⤷ ${ blue('libserial1') }`
+        ]
+
+    } else {
+
+        try {
+            await installSerialLibrary();
+        } catch (error) {
+
+            throw error;
+        }
+
+
+    }
+
+
+    let delta = Date.now() - before;
+
+    await sleep(800 - delta);
+
+    content.pop();
+    content.pop();
+    content.push(...result);
+
+    drawInstallMenu();
+
+
+
+
+    await sleep(400);
+
+    content.push(
+        '',
+        `   ⏳ Creating the ${ red('ServedSpicy Folder') }.` ,
+        `      ⤷ ${ blue(folder) }`
+    );
+
+
+    drawInstallMenu();
+
+    result = [
+        `   ✅ Created the ${ red('ServedSpicy Folder') }` ,
+        `      ⤷ ${ blue(folder) }`
+    ];
+
+    before = Date.now();
+
+    try {
+        await createFolder();
+    } catch (error) {
+
+        throw error;
+    }
+
+
+    delta = Date.now() - before;
+
+    await sleep(800 - delta);
+
+    content.pop();
+    content.pop();
+    content.push(...result);
+
+    drawInstallMenu();
+
+
+
+    await sleep(400);
+
+    content.push(
+        '',
+        `   ⏳ Downloading the ${ red('Latest Release') }.` ,
+        `      ⤷ ${ blue(folder) }`
+    );
+
+
+    drawInstallMenu();
+
+    result = [
+        `   ✅ Downloaded the ${ red('Latest Release') }` ,
+        `      ⤷ ${ blue(folder) }`
+    ];
+
+    before = Date.now();
+
+    try {
+        await curlRelease();
+    } catch (error) {
+
+        throw error;
+    }
+
+
+    delta = Date.now() - before;
+
+    await sleep(800 - delta);
+
+    content.pop();
+    content.pop();
+    content.push(...result);
+
+
+    drawInstallMenu();
+
+
+
+    await sleep(400);
+
+    content.push(
+        '',
+        `   ⏳ Adding the ${ red('Desktop Entry') }.` ,
+        `      ⤷ ${ blue(desktop_entry) }`
+    );
+
+    result = [
+        `   ✅ Added the ${ red('Desktop Entry') }` ,
+        `      ⤷ ${ blue(desktop_entry) }`
+    ];
+
+    before = Date.now();
+
+    try {
+        await addDesktopEntry();
+    } catch (error) {
+
+        throw error;
+    }
+
+    delta = Date.now() - before;
+
+    await sleep(800 - delta);
+
+    content.pop();
+    content.pop();
+    content.push(...result);
+
+
+
+    actions = `Press [${ blue('Enter') }] to finish.`;
+
+    drawInstallMenu();
+
+
     while(true){
-        await userInput();
+        const key = await userInput([ Enter ]);
+
+        if(key)
+            exit();
     }
 }
 
@@ -166,12 +430,39 @@ async function removeApplicationFolder(){
     await Deno.remove(folder,{ recursive : true });
 }
 
+import { walk } from 'File';
+
+
+async function * removeTemporaryFiles(){
+
+    let count = 0;
+    let files = [];
+
+    for await (const entry of walk('/tmp/',{
+        followSymlinks : false ,
+        includeDirs : true ,
+        includeFiles : true ,
+        match : [ /^\/tmp\/ServedSpicy_/ ] ,
+        maxDepth : 1
+    })){
+        console.log(entry.path);
+        files.push(entry.path);
+        count++;
+
+        await Deno.remove(entry.path,{ recursive : true });
+
+        yield [ count , files ];
+    }
+
+    // return [ count , files ];
+}
+
 async function uninstall(){
 
     actions = '';
 
     content = [
-        `   ⏳ Removing ${ red('DesktopEntry') }` ,
+        `   ⏳ Removing ${ red('Desktop Entry') }` ,
         `      ⤷ ${ blue(desktop_entry) }`
     ];
 
@@ -180,7 +471,7 @@ async function uninstall(){
     let before = Date.now();
 
     let result = [
-        `   ✅ Removed ${ red('DesktopEntry') }` ,
+        `   ✅ Removed ${ red('Desktop Entry') }` ,
         `      ⤷ ${ blue(desktop_entry) }`
     ];
 
@@ -191,7 +482,7 @@ async function uninstall(){
         switch(true){
         case error instanceof Deno.errors.NotFound:
             result = [
-                `   💬 The ${ red('DesktopEntry') } wasn't present to begin with.` ,
+                `   💬 The ${ red('Desktop Entry') } wasn't present to begin with.` ,
                 `      ⤷ ${ blue(desktop_entry) }`
             ]
             break;
@@ -209,6 +500,10 @@ async function uninstall(){
     content.push(...result);
 
     drawUninstallMenu();
+
+
+
+
 
     await sleep(400);
 
@@ -253,16 +548,87 @@ async function uninstall(){
     content.pop();
     content.push(...result);
 
+    drawUninstallMenu();
+
+
+    await sleep(400);
+
+    content.push(
+        '',
+        `   ⏳ Removing leftover ${ red('Temporary Files') }.` ,
+    );
+
+
+    drawUninstallMenu();
+
+
+
+    // before = Date.now();
+
+
+    let c = 0;
+
+    try {
+
+        result = [
+            `   💬 There weren't any leftover ${ red('Temporary Files') } to begin with.` ,
+            `      ⤷ ${ blue('/tmp/ServedSpicy_*') }`
+        ]
+
+        for await (const [ count , files ] of removeTemporaryFiles()){
+
+            c = count;
+
+            result = [
+                `   ✅ Removed ${ red(count) } leftover ${ red('Temporary Files') }.` ,
+                ...files
+                .map((file) => {
+                    return `      ⤷ ${ blue(file) }`
+                })
+            ];
+
+            for(let i = 0;i < c;i++)
+                content.pop();
+
+            content.push(...result);
+
+            drawUninstallMenu();
+
+            if(count < 100)
+                await sleep(100 / count);
+        }
+
+        if(c < 1){
+
+            content.pop();
+            content.push(...result);
+        }
+
+        drawUninstallMenu();
+
+    } catch (error) {
+
+        throw error;
+    }
+
+    //
+    // delta = Date.now() - before;
+    //
+    // await sleep(800 - delta);
+
+
+
     actions = `Press [${ blue('Enter') }] to finish.`;
 
     drawUninstallMenu();
+
 
 
     while(true){
         const key = await userInput([ Enter ]);
 
         if(key)
-            Deno.exit();
+            exit();
     }
 }
 

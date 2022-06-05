@@ -8,7 +8,7 @@ const variables = {
     Version : version ,
     Name : 'ServedSpicy' ,
     Comment : 'The recipe manager for ServedSpicy machines.' ,
-    Exec : app_launcher ,
+    Exec : `${ app_launcher } 2424 2425` ,
     Icon : app_icon ,
     Terminal : false ,
     Type : 'Application' ,
@@ -19,7 +19,7 @@ const variables = {
 const lines = Object
     .entries(variables)
     .map(toPair);
-    
+
 lines.unshift('[Desktop Entry]');
 
 

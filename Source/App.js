@@ -21,6 +21,9 @@ const Arrow_Right = [ 27 , 91 , 67 ];
 const Enter = [ 13 ];
 const Escape = [ 27 ];
 
+const release = 'https://github.com/ServedSpicy/Bundle/releases/download/Alpha-0.1.0/ServedSpicy.zip';
+
+
 const folder = join(Parameter.home,'.ServedSpicy');
 
 
@@ -211,7 +214,6 @@ async function curlRelease(){
 
     const dir = await makeTemporaryFolder();
 
-    const release = 'https://github.com/ServedSpicy/Bundle/releases/download/Dummy/Dummy.zip';
 
     {
         const process = Deno.run({

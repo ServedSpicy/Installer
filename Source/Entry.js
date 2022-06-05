@@ -5,15 +5,19 @@ import { version } from './Version.js'
 
 
 const variables = {
-    Version : version ,
+    Version : '1.4' ,
     Name : 'ServedSpicy' ,
     Comment : 'The recipe manager for ServedSpicy machines.' ,
-    Exec : `nohup ${ app_launcher } 2424 2425 > Log.txt 2>&1 &` ,
+    Exec : `"nohup ${ app_launcher } 2424 2425 > Log.txt 2>&1 &"` ,
     Icon : app_icon ,
     Path : app_folder ,
-    Terminal : false ,
+    Terminal : 'false' ,
     Type : 'Application' ,
-    Categories : 'Utility;Electronics;HardwareSettings'
+    MimeType : 'text/yaml' ,
+    Categories : 'Utility;Electronics' ,
+    'X-SingleMainWindow' : 'true' ,
+    Keywords : 'Configurator;Recipe;Spice' ,
+    GenericName : 'Configurator'
 };
 
 const lines = Object

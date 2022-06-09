@@ -1,5 +1,14 @@
 
 
+const { consoleSize , stdout } = Deno;
+const { log } = console;
+
+
+let { columns , rows } = consoleSize(stdout.rid);
+
+rows -= 3;
+
+
 export function center(text){
 
     const length = width(text);

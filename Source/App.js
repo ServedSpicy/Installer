@@ -2,13 +2,15 @@
 import { Ctrl_C , Arrow_Up , Arrow_Down , Arrow_Left , Arrow_Right , Enter , Escape } from './Keys.js'
 import { blue , red , bold , dark } from 'Color';
 import { desktop_entry , folder } from './Paths.js'
-import { emptyDir , walk } from 'File';
 import { entry } from './Entry.js'
 import { join } from 'Path';
-import Serial from './Actions/Serial.js'
-import Temp from './Actions/Temp.js'
+import * as Serial from './Actions/Serial.js'
+
 import { limit } from './Math.js'
 import { center , lines , width , fill } from './Format.js'
+import { emptyDir , walk } from 'File';
+import uninstall from './Menu/Uninstall.js'
+import { userInput } from './Input.js'
 
 
 const { writeTextFile , consoleSize , stdout , args , chown } = Deno;
@@ -35,7 +37,6 @@ async function addDesktopEntry(){
 
 rows -= 3;
 
-// log(blue(('🯰'.repeat(columns)).repeat(rows)))
 
 let option = 1;
 let content = [];
@@ -44,7 +45,6 @@ let actions = '';
 
 Deno.setRaw(0,true);
 
-// log(blue('🮕🮕🮕\n🮕🮕',true))
 
 function drawMainMenu(){
 
@@ -105,23 +105,7 @@ function drawUpdateMenu(){
 
 }
 
-function drawUninstallMenu(){
 
-    clear();
-
-    log(fill([
-        '' ,
-        `  Ｕｎｉｎｓｔａｌｌｉｎｇ　${ bold(red('ＳｅｒｖｅｄＳｐｉｃｙ')) }`,
-        '' ,
-        ... content ,
-        ... lines(rows - (content.length + 3 + 4)) ,
-        '' ,
-        center(actions),
-        '' ,
-        ''
-    ].join('\n'),dark));
-
-}
 
 function select(title,isSelected = false){
     return isSelected
@@ -396,190 +380,7 @@ async function update(){
     }
 }
 
-async function removeDesktopEntry(){
-    await Deno.remove(desktop_entry);
-}
 
-
-async function removeApplicationFolder(){
-    await Deno.remove(folder,{ recursive : true });
-}
-
-
-async function uninstall(){
-
-    actions = '';
-
-    content = [
-        `   ⏳ Removing ${ red('Desktop Entry') }` ,
-        `      ⤷ ${ blue(desktop_entry) }`
-    ];
-
-    drawUninstallMenu();
-
-    let before = Date.now();
-
-    let result = [
-        `   ✅ Removed ${ red('Desktop Entry') }` ,
-        `      ⤷ ${ blue(desktop_entry) }`
-    ];
-
-    try {
-        await removeDesktopEntry();
-    } catch (error) {
-
-        switch(true){
-        case error instanceof Deno.errors.NotFound:
-            result = [
-                `   💬 The ${ red('Desktop Entry') } wasn't present to begin with.` ,
-                `      ⤷ ${ blue(desktop_entry) }`
-            ]
-            break;
-        default:
-            throw error;
-        }
-    }
-
-    let delta = Date.now() - before;
-
-    await sleep(800 - delta);
-
-    content.pop();
-    content.pop();
-    content.push(...result);
-
-    drawUninstallMenu();
-
-
-
-
-
-    await sleep(400);
-
-    content.push(
-        '',
-        `   ⏳ Removing ${ red('Application Folder') }` ,
-        `      ⤷ ${ blue(folder) }`
-    );
-
-
-    drawUninstallMenu();
-
-    result = [
-        `   ✅ Removed the ${ red('Application Folder') }` ,
-        `      ⤷ ${ blue(folder) }`
-    ];
-
-    before = Date.now();
-
-    try {
-        await removeApplicationFolder();
-    } catch (error) {
-
-        switch(true){
-        case error instanceof Deno.errors.NotFound:
-            result = [
-                `   💬 The ${ red('Application Folder') } wasn't present to begin with.` ,
-                `      ⤷ ${ blue(folder) }`
-            ]
-            break;
-        default:
-            throw error;
-        }
-    }
-
-
-    delta = Date.now() - before;
-
-    await sleep(800 - delta);
-
-    content.pop();
-    content.pop();
-    content.push(...result);
-
-    drawUninstallMenu();
-
-
-    await sleep(400);
-
-    content.push(
-        '',
-        `   ⏳ Removing leftover ${ red('Temporary Files') }.` ,
-    );
-
-
-    drawUninstallMenu();
-
-
-
-    // before = Date.now();
-
-
-    let c = 0;
-
-    try {
-
-        result = [
-            `   💬 There weren't any leftover ${ red('Temporary Files') } to begin with.` ,
-            `      ⤷ ${ blue('/tmp/ServedSpicy_*') }`
-        ]
-
-        for await (const [ count , files ] of Temp.remove()){
-
-            c = count;
-
-            result = [
-                `   ✅ Removed ${ red(count) } leftover ${ red('Temporary Files') }.` ,
-                ...files
-                .map((file) => {
-                    return `      ⤷ ${ blue(file) }`
-                })
-            ];
-
-            for(let i = 0;i < c;i++)
-                content.pop();
-
-            content.push(...result);
-
-            drawUninstallMenu();
-
-            if(count < 100)
-                await sleep(100 / count);
-        }
-
-        if(c < 1){
-
-            content.pop();
-            content.push(...result);
-        }
-
-        drawUninstallMenu();
-
-    } catch (error) {
-
-        throw error;
-    }
-
-    //
-    // delta = Date.now() - before;
-    //
-    // await sleep(800 - delta);
-
-
-
-    actions = `Press [${ blue('Enter') }] to finish.`;
-
-    drawUninstallMenu();
-
-
-
-    while(true){
-        const key = await userInput([ Enter ]);
-
-        if(key)
-            exit();
-    }
-}
 
 function sleep(millis){
     return new Promise((resolve) => {
@@ -622,49 +423,7 @@ async function mainMenu(){
 
 
 
-async function userInput(validKeys = []){
 
-    const buffer = new Uint8Array(16);
-
-    while(true){
-
-        const count = await Deno.stdin.read(buffer);
-
-        if(count === null)
-            exit();
-
-        const [ key ] = buffer;
-
-        if(key === Ctrl_C)
-            exit();
-
-        if(key === 110 || key === 121)
-            if(!validKeys.includes([ key ]))
-                Deno.exit();
-
-        const sequence = buffer.slice(0,count);
-
-        // log(sequence);
-
-        for(const key of validKeys)
-            if(isKey(sequence,key))
-                return key;
-    }
-}
-
-function isKey(buffer,key){
-
-    const { length } = buffer;
-
-    if(length !== key.length)
-        return false;
-
-    for(let i = 0;i < length;i++)
-        if(buffer.at(i) !== key[i])
-            return false;
-
-    return true;
-}
 
 
 function exit(){

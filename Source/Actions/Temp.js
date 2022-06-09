@@ -1,5 +1,8 @@
 
 
+import { walk } from 'File';
+
+
 export async function * remove(){
 
     let count = 0;
@@ -12,7 +15,6 @@ export async function * remove(){
         match : [ /^\/tmp\/ServedSpicy_/ ] ,
         maxDepth : 1
     })){
-        console.log(entry.path);
         files.push(entry.path);
         count++;
 

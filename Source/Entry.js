@@ -3,6 +3,9 @@ import { app_icon , app_launcher , app_folder } from './Paths.js'
 import { version } from './Version.js'
 
 
+const toPair = ([ key , value ]) =>
+    `${ key }=${ value }`;
+
 
 const variables = {
     Version : '1.4' ,
@@ -20,6 +23,7 @@ const variables = {
     GenericName : 'Configurator'
 };
 
+
 const lines = Object
     .entries(variables)
     .map(toPair);
@@ -27,10 +31,5 @@ const lines = Object
 lines.unshift('[Desktop Entry]');
 
 
-export const entry = lines.join('\n');
-
-
-
-function toPair([ key , value ]){
-    return `${ key }=${ value }`;
-}
+export const entry =
+    lines.join('\n');

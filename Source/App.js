@@ -1,47 +1,36 @@
 
+import { Ctrl_C , Arrow_Up , Arrow_Down , Arrow_Left , Arrow_Right , Enter , Escape } from './Keys.js'
 import { blue , red , bold , dark } from 'Color';
+import { desktop_entry , folder } from './Paths.js'
+import { emptyDir , walk } from 'File';
+import { entry } from './Entry.js'
 import { join } from 'Path';
-import { emptyDir } from 'File';
-import { walk } from 'File';
+import Serial from './Actions/Serial.js'
+import Temp from './Actions/Temp.js'
+import { limit } from './Math.js'
+import { center , lines , width , fill } from './Format.js'
 
 
+const { writeTextFile , consoleSize , stdout , args , chown } = Deno;
 const { log , clear } = console;
 
-let { columns, rows } = Deno.consoleSize(Deno.stdout.rid);
+
+let { columns, rows } = consoleSize(stdout.rid);
 
 
 import { parse } from 'Args';
-const Parameter = parse(Deno.args);
+const Parameter = parse(args);
 
-const Ctrl_C = 0x03;
-const Arrow_Up = [ 27 , 91 , 65 ];
-const Arrow_Left = [ 27 , 91 , 68 ];
-const Arrow_Down = [ 27 , 91 , 66 ];
-const Arrow_Right = [ 27 , 91 , 67 ];
-const Enter = [ 13 ];
-const Escape = [ 27 ];
+
 
 const release = 'https://github.com/ServedSpicy/Bundle/releases/download/Alpha-0.1.0/ServedSpicy.zip';
 
 
-const folder = join(Parameter.home,'.ServedSpicy');
-
-
-
-const { min , max } = Math;
-
-
-
-import { desktop_entry } from './Paths.js'
-import { entry } from './Entry.js'
-
-const { writeTextFile } = Deno;
 
 async function addDesktopEntry(){
     await writeTextFile(desktop_entry,entry);
-    await Deno.chown(desktop_entry,Parameter.user,Parameter.group);
+    await chown(desktop_entry,Parameter.user,Parameter.group);
 }
-
 
 
 rows -= 3;
@@ -188,20 +177,6 @@ async function isSerialInstalled(){
     return packages.has('libserial1');
 }
 
-async function installSerialLibrary(){
-
-    const process = Deno.run({
-        cmd : [ 'apt' , 'install' , 'libserial1' ],
-        stdout : 'null' ,
-        stderr : 'null'
-    });
-
-    const status = await process.status();
-
-    // log(status);
-
-    // Deno.exit();
-}
 
 async function createFolder(){
     await emptyDir(folder);
@@ -273,15 +248,7 @@ async function install(){
         ]
 
     } else {
-
-        try {
-            await installSerialLibrary();
-        } catch (error) {
-
-            throw error;
-        }
-
-
+        await Serial.install();
     }
 
 
@@ -439,31 +406,6 @@ async function removeApplicationFolder(){
 }
 
 
-
-async function * removeTemporaryFiles(){
-
-    let count = 0;
-    let files = [];
-
-    for await (const entry of walk('/tmp/',{
-        followSymlinks : false ,
-        includeDirs : true ,
-        includeFiles : true ,
-        match : [ /^\/tmp\/ServedSpicy_/ ] ,
-        maxDepth : 1
-    })){
-        console.log(entry.path);
-        files.push(entry.path);
-        count++;
-
-        await Deno.remove(entry.path,{ recursive : true });
-
-        yield [ count , files ];
-    }
-
-    // return [ count , files ];
-}
-
 async function uninstall(){
 
     actions = '';
@@ -582,7 +524,7 @@ async function uninstall(){
             `      ⤷ ${ blue('/tmp/ServedSpicy_*') }`
         ]
 
-        for await (const [ count , files ] of removeTemporaryFiles()){
+        for await (const [ count , files ] of Temp.remove()){
 
             c = count;
 
@@ -676,65 +618,9 @@ async function mainMenu(){
 }
 
 
-function limit(value,minimum,maximum){
-    return min(max(value,minimum),maximum);
-}
 
 
-function center(text){
 
-    const length = width(text);
-
-    const padding = (columns - length) * .5;
-
-    return (
-        ' '.repeat(padding) +
-        text +
-        ' '.repeat(columns - length - padding)
-    );
-}
-
-function * lines(amount){
-    while(amount-- >= 0)
-        yield '';
-}
-
-function width(text){
-
-    const chars = text
-        .replace(/\u001b[^m]*?m/g,'')
-        .split('');
-
-    let w = 0;
-
-    for(const char of chars){
-
-        const code = char.charCodeAt(0);
-
-        if(code >= 65281 && code <= 65376 || code === 12288 || char === '⏳' || char === '✅'){
-            w += 2;
-            continue;
-        }
-
-        w++;
-    }
-
-    return w;
-}
-
-function fill(text,color){
-
-    text = text
-        .split('\n')
-        .map((line) => line + ' '.repeat(columns - width(line)));
-
-    for(let i = text.length;i <= rows;i++)
-        text.push(' '.repeat(columns));
-
-    text = text.join('\n');
-
-    return color(text,true);
-}
 
 async function userInput(validKeys = []){
 
@@ -783,6 +669,5 @@ function isKey(buffer,key){
 
 function exit(){
     clear();
-    // Deno.setRaw(0,false);
     Deno.exit();
 }

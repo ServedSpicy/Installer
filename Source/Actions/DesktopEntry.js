@@ -1,6 +1,6 @@
 
-import { app_icon , app_launcher , app_folder } from './Paths.js'
-import { version } from './Version.js'
+import { app_icon , app_launcher , app_folder } from '../Paths.js'
+import { version } from '../Version.js'
 
 
 const toPair = ([ key , value ]) =>
@@ -31,5 +31,19 @@ const lines = Object
 lines.unshift('[Desktop Entry]');
 
 
-export const entry =
-    lines.join('\n');
+const entry = lines.join('\n');
+
+
+const { writeTextFile , args , chown } = Deno;
+import { desktop_entry } from '../Paths.js'
+import { parse } from 'Args';
+const Parameter = parse(args);
+
+export async function add(){
+    await writeTextFile(desktop_entry,entry);
+    await chown(desktop_entry,Parameter.user,Parameter.group);
+}
+
+export async function remove(){
+    await Deno.remove(desktop_entry);
+}

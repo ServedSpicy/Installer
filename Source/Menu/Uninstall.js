@@ -5,6 +5,7 @@ import { desktop_entry , folder } from '../Paths.js'
 import { blue , red , bold , dark } from 'Color';
 import * as Temp from '../Actions/Temp.js'
 import { userInput } from '../Input.js'
+import * as DesktopEntry from '../Actions/DesktopEntry.js'
 
 
 
@@ -32,10 +33,6 @@ function sleep(millis){
     });
 }
 
-
-async function removeDesktopEntry(){
-    await Deno.remove(desktop_entry);
-}
 
 async function removeApplicationFolder(){
     await Deno.remove(folder,{ recursive : true });
@@ -82,7 +79,7 @@ export default async function(){
     ];
 
     try {
-        await removeDesktopEntry();
+        await DesktopEntry.remove();
     } catch (error) {
 
         switch(true){

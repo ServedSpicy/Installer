@@ -10,6 +10,7 @@ import { userInput } from '../Input.js'
 import * as Folder from '../Actions/Folder.js'
 import { join } from 'Path';
 import { walk } from 'File';
+import { exit , sleep  } from '../Deno.js'
 
 
 const release = 'https://github.com/ServedSpicy/Bundle/releases/download/Alpha-0.1.0/ServedSpicy.zip';
@@ -30,18 +31,6 @@ rows -= 3;
 let content = [];
 let actions = '';
 
-
-
-function exit(){
-    clear();
-    Deno.exit();
-}
-
-function sleep(millis){
-    return new Promise((resolve) => {
-        setTimeout(resolve,millis);
-    });
-}
 
 
 

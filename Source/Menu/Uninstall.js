@@ -6,7 +6,7 @@ import { blue , red , bold , dark } from 'Color';
 import * as Temp from '../Actions/Temp.js'
 import { userInput } from '../Input.js'
 import * as DesktopEntry from '../Actions/DesktopEntry.js'
-
+import { exit , sleep } from '../Deno.js'
 
 
 const { consoleSize , stdout } = Deno;
@@ -21,17 +21,6 @@ rows -= 3;
 let actions = '';
 let content = [];
 
-
-function exit(){
-    clear();
-    Deno.exit();
-}
-
-function sleep(millis){
-    return new Promise((resolve) => {
-        setTimeout(resolve,millis);
-    });
-}
 
 
 async function removeApplicationFolder(){

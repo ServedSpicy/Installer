@@ -1,5 +1,6 @@
 
 import { Ctrl_C } from './Keys.js'
+import { exit } from './Deno.js'
 
 
 export async function userInput(validKeys = []){
@@ -23,8 +24,6 @@ export async function userInput(validKeys = []){
                 Deno.exit();
 
         const sequence = buffer.slice(0,count);
-
-        // log(sequence);
 
         for(const key of validKeys)
             if(isKey(sequence,key))

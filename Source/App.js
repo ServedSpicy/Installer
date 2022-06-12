@@ -2,11 +2,11 @@
 import main from './Menu/Main.js'
 import { exit } from './Deno.js'
 
-const { setRaw } = Deno;
+const { setRaw , stdin } = Deno;
 
 
 
-setRaw(0,true);
+setRaw(stdin.rid,true);
 
 await main();
 

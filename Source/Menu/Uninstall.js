@@ -143,6 +143,56 @@ export default async function(){
     draw();
 
 
+
+    {
+        await sleep(400);
+
+        content.push(
+            '',
+            `   ⏳ Removing ${ red('ServedSpicy') } command.` ,
+            `      ⤷ ${ blue('/usr/bin/ServedSpicy') }`
+        );
+
+
+        draw();
+
+        result = [
+            `   ✅ Removed ${ red('ServedSpicy') } command.` ,
+            `      ⤷ ${ blue('/usr/bin/ServedSpicy') }`
+        ];
+
+        before = Date.now();
+
+        try {
+            await Deno.remove('/usr/bin/ServedSpicy');
+        } catch (error) {
+
+            switch(true){
+            case error instanceof Deno.errors.NotFound:
+                result = [
+                    `   💬 The ${ red('ServedSpicy') } command wasn't present to begin with.` ,
+                    `      ⤷ ${ blue('/usr/bin/ServedSpicy') }`
+                ]
+                break;
+            default:
+                throw error;
+            }
+        }
+
+
+        delta = Date.now() - before;
+
+        await sleep(800 - delta);
+
+        content.pop();
+        content.pop();
+        content.push(...result);
+
+        draw();
+    }
+
+
+
     await sleep(400);
 
     content.push(

@@ -42,6 +42,7 @@ const Parameter = parse(args);
 export async function add(){
     await writeTextFile(desktop_entry,entry);
     await chown(desktop_entry,Parameter.user,Parameter.group);
+    await Deno.chmod(desktop_entry,0o755);
 }
 
 export async function remove(){

@@ -310,6 +310,46 @@ export default async function(){
 
     await sleep(400);
 
+    {
+        content.push(
+            '',
+            `   ⏳ Registering ${ red('ServedSpicy') } command.` ,
+            `      ⤷ ${ blue('/usr/bin/ServedSpicy') }`
+        );
+
+
+        draw();
+
+        result = [
+            `   ✅ Registered ${ red('ServedSpicy') } command.` ,
+            `      ⤷ ${ blue('/usr/bin/ServedSpicy') }`
+        ];
+
+        before = Date.now();
+
+        await Deno.writeTextFile('/usr/bin/ServedSpicy',[
+            '#!/usr/bin/env sh' ,
+            '~/.ServedSpicy/App/Client.sh 2424 2425'
+        ].join('\n'));
+
+        await Deno.chmod('/usr/bin/ServedSpicy',0o755);
+
+
+        delta = Date.now() - before;
+
+        await sleep(800 - delta);
+
+        content.pop();
+        content.pop();
+        content.push(...result);
+
+        draw();
+    }
+
+
+
+    await sleep(400);
+
     content.push(
         '',
         `   ⏳ Adding the ${ red('Desktop Entry') }.` ,

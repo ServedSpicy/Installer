@@ -5,8 +5,12 @@ import { exit } from './Deno.js'
 const { setRaw , stdin } = Deno;
 
 
+try {
 
-setRaw(stdin.rid,true);
+    setRaw(stdin.rid,true);
+
+} catch (error) {}
+
 
 await main();
 

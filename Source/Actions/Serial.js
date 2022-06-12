@@ -1,6 +1,11 @@
 
+import { basename } from 'Path'
+import { parse } from 'Args'
 
-const { run } = Deno;
+
+const { args  , chown , run } = Deno;
+const { home } = parse(args);
+const user = basename(home)
 
 
 const command_install = {
@@ -9,9 +14,22 @@ const command_install = {
     stderr : 'null'
 }
 
-const command_check = {
+const command_packages = {
     cmd : [ 'dpkg-query' , '--show' , '--showformat=${Package}|${Version}' , 'libserial1' ],
-    stdout : 'piped'
+    stdout : 'piped' ,
+    stderr : 'null'
+}
+
+const command_groups = {
+    cmd : [ 'groups' , user ] ,
+    stdout : 'piped' ,
+    stderr : 'null'
+}
+
+const command_join = {
+    cmd : [ 'usermod' , '--append' ,'--groups' , 'dialout' , user ] ,
+    stdout : 'null' ,
+    stderr : 'null'
 }
 
 
@@ -24,7 +42,7 @@ export async function install(){
 
 export async function isInstalled(){
 
-    const process = run(command_check);
+    const process = run(command_packages);
     const status = await process.status();
 
     const out = await process.output();
@@ -42,4 +60,30 @@ export async function isInstalled(){
     packages = new Map(packages);
 
     return packages.has('libserial1');
+}
+
+
+export async function hasPermissions(){
+
+    const process = run(command_groups);
+    const status = await process.status();
+
+    const out = await process.output();
+
+    let info = new TextDecoder().decode(out);
+
+    if(!info.startsWith(user))
+        return false;
+
+    const groups = info
+        .split(':')[1]
+        .split(' ');
+
+    return groups.includes('dialout');
+}
+
+
+export async function givePermissions(){
+    const process = run(command_join);
+    const status = await process.status();
 }

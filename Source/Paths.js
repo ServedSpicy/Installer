@@ -4,8 +4,7 @@ import { parse } from 'Args';
 import { join } from 'Path';
 
 
-const { env , args } = Deno;
-
+const { args } = Deno;
 const { home } = parse(args);
 
 

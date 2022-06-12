@@ -1,6 +1,5 @@
 
 import { app_icon , app_launcher , app_folder } from '../Paths.js'
-import { version } from '../Version.js'
 
 
 const toPair = ([ key , value ]) =>

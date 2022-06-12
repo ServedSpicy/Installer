@@ -134,6 +134,48 @@ export default async function(){
     draw();
 
 
+    await sleep(400);
+
+    {
+        content.push(
+            '',
+            `   ⏳ Adding user to the ${ red('dialout') } group.`
+        );
+
+
+        draw();
+
+        result = [
+            `   ✅ Added user to the ${ red('dialout') } group.`
+        ];
+
+        before = Date.now();
+
+        let partOf = await Serial.hasPermissions();
+
+        if(partOf){
+
+            result = [
+                `   💬 User was already part of the ${ red('dialout') } group.` ,
+            ]
+
+        } else {
+            await Serial.givePermissions();
+        }
+
+
+        delta = Date.now() - before;
+
+        await sleep(800 - delta);
+
+        content.pop();
+        content.push(...result);
+
+        draw();
+    }
+
+
+
 
     await sleep(400);
 

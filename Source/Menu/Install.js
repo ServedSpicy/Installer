@@ -160,7 +160,14 @@ export default async function(){
             ]
 
         } else {
+
+            const groupExists = Serial.permissionExist();
+
+            if(!groupExists)
+                await Serial.makePermissions();
+
             await Serial.givePermissions();
+
         }
 
 

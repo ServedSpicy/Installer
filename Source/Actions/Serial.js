@@ -9,7 +9,7 @@ const user = basename(home)
 
 
 const command_install = {
-    cmd : [ 'apt' , 'install' , 'libserial1' ],
+    cmd : [ 'apt' , 'install' , 'libserial1' ] ,
     stdout : 'null' ,
     stderr : 'null'
 }
@@ -20,8 +20,14 @@ const command_packages = {
     stderr : 'null'
 }
 
-const command_groups = {
+const command_user = {
     cmd : [ 'groups' , user ] ,
+    stdout : 'piped' ,
+    stderr : 'null'
+}
+
+const command_groups = {
+    cmd : [ 'groups' ] ,
     stdout : 'piped' ,
     stderr : 'null'
 }
@@ -31,6 +37,13 @@ const command_join = {
     stdout : 'null' ,
     stderr : 'null'
 }
+
+const command_make = {
+    cmd : [ 'groupadd' , 'dialout' ] ,
+    stdout : 'null' ,
+    stderr : 'null'
+}
+
 
 
 export async function install(){
@@ -65,7 +78,7 @@ export async function isInstalled(){
 
 export async function hasPermissions(){
 
-    const process = run(command_groups);
+    const process = run(command_user);
     const status = await process.status();
 
     const out = await process.output();
@@ -80,6 +93,32 @@ export async function hasPermissions(){
         .split(' ');
 
     return groups.includes('dialout');
+}
+
+
+export async function permissionExist(){
+
+    const process = run(command_groups);
+    const status = await process.status();
+
+    const out = await process.output();
+
+    let info = new TextDecoder().decode(out);
+
+    if(!info.startsWith(user))
+        return false;
+
+    const groups = info
+        .split(' ');
+
+    return groups.includes('dialout');
+}
+
+
+
+export async function makePermissions(){
+    const process = run(command_make);
+    const status = await process.status();
 }
 
 

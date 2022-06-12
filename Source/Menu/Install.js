@@ -1,5 +1,6 @@
 
 import * as Serial from '../Actions/Serial.js'
+import * as WebKit from '../Actions/WebKit.js'
 import { Enter } from '../Keys.js'
 import { center , lines , width , fill } from '../Format.js'
 import { desktop_entry , folder } from '../Paths.js'
@@ -133,6 +134,52 @@ export default async function(){
     draw();
 
 
+
+    await sleep(400);
+
+    {
+        content.push(
+            '',
+            `   ⏳ Installing ${ red('WebKit Library') } via ${ red('DPKG') }.` ,
+            `      ⤷ ${ blue('libwebkit2gtk-4.0-37') }`
+        );
+
+
+        draw();
+
+        result = [
+            `   ✅ Installed ${ red('WebKit Library') } via ${ red('DPKG') }.` ,
+            `      ⤷ ${ blue('libwebkit2gtk-4.0-37') }`
+        ];
+
+        before = Date.now();
+
+        let installed = false;
+
+        installed = await WebKit.isInstalled();
+
+        if(installed){
+
+            result = [
+                `   💬 The ${ red('Serial Library') } was already installed.` ,
+                `      ⤷ ${ blue('libwebkit2gtk-4.0-37') }`
+            ]
+
+        } else {
+            await WebKit.install();
+        }
+
+
+        delta = Date.now() - before;
+
+        await sleep(800 - delta);
+
+        content.pop();
+        content.pop();
+        content.push(...result);
+
+        draw();
+    }
 
 
     await sleep(400);

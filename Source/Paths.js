@@ -14,7 +14,7 @@ export const desktop_entry =
     join(home,'.local','share','applications','ServedSpicy.desktop');
 
 export const config =
-    join(home,'.cache','ServedSpicy');
+    join(home,'.config','ServedSpicy');
 
 
 export const folder =

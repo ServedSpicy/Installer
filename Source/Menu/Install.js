@@ -267,7 +267,7 @@ export default async function(){
     content.push(
         '',
         `   ⏳ Downloading the ${ red('Latest Release') }.` ,
-        `      ⤷ ${ blue(folder) }`
+        `      ⤷ ${ blue(folder + '/ServedSpicy.zip') }`
     );
 
 
@@ -275,7 +275,7 @@ export default async function(){
 
     result = [
         `   ✅ Downloaded the ${ red('Latest Release') }` ,
-        `      ⤷ ${ blue(folder) }`
+        `      ⤷ ${ blue(folder + '/ServedSpicy.zip') }`
     ];
 
     before = Date.now();

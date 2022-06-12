@@ -14,7 +14,7 @@ import { walk } from 'File';
 import { exit , sleep  } from '../Deno.js'
 
 
-const release = 'https://github.com/ServedSpicy/Bundle/releases/download/Alpha-0.2.0/ServedSpicy.zip';
+const release = 'https://github.com/ServedSpicy/Bundle/releases/download/Alpha-0.3.0/ServedSpicy.zip';
 
 
 const { writeTextFile , args , stdout , consoleSize } = Deno;
